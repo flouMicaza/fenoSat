@@ -26,7 +26,7 @@ aggregate_test<- function(){
     #aggregate
     print("Calculamos con aggregate")
     ti_agg <- Sys.time()
-    stack_final <- aggregate(stack1,fact = c(1,1,23),fun=mean)
+    stack_final <- aggregate(stack1,fact = c(1,1,23),fun=var)
     tf_agg <- Sys.time()
     tt_agg <- tf_agg - ti_agg
     
@@ -52,16 +52,23 @@ math_mean_test<-function(){
     #calculate mean for each year and show how long does it take to do it. 
     stack1 <- stack(files[1:cant_imagenes])
     #math_mean
+    #calculamos los indices a juntar
+    indices_fin <- c()
+   
+    print("Calculamos con stackaply")
+    ti_math <- Sys.time()
+    for (i in 1:ano) {
+      indices <- rep(i,times=23)
+      indices_fin <- c(indices_fin,indices)
+    }
+    stackApply(stack1,indices = indices_fin ,fun=var)
+    tf_math <- Sys.time()
+    tt_math <- tf_math - ti_math
     
-    print("Calculamos con aggregate")
-    ti_agg <- Sys.time()
-    stack_final <- aggregate(stack1,fact = c(1,1,23),fun=mean)
-    tf_agg <- Sys.time()
-    tt_agg <- tf_agg - ti_agg
-    
-    print(paste("Para", ano,"años, aggregate toma"))
-    print(tt_agg)
+    print(paste("Para", ano,"años, math toma"))
+    print(tt_math)
   }
 }
 
 math_mean_test()
+
