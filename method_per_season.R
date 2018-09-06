@@ -26,7 +26,7 @@ separate_by_season <- function(dir, num_years){
   
   summer_stack <-stack(files[1:5]) #append new layers
   files <- files[-images] #drop images that are already in a stack. 
-
+  
   #For other seasons a year is represented by 6 images. 
   images<-1:6
   autumn_stack <- stack(files[1:6]) #append new layers
@@ -37,7 +37,7 @@ separate_by_season <- function(dir, num_years){
   
   spring_stack <-stack(files[1:6]) #append new layers
   files <- files[-images]
-
+  
   
   #We add the images that represent a year for each season. 
   for (year in 2:num_years) {
@@ -65,15 +65,15 @@ separate_by_season <- function(dir, num_years){
   results <- list("summer"=summer_stack,"autumn"=autumn_stack,"winter"=winter_stack,"spring"=spring_stack)
   print("Stacks per season ready!")
   return(results)
-
+  
 }
 
 ###########################MEAN BY SEASON ###################################################################
-#Method that calculates the average per season 
-#It generates a new file for each season with the average of each year if export=TRUE.
+#Method that calculates a method per season 
+#It generates a new file for each season with the result of the method of each year if export=TRUE.
 #It also generates a file with mean values per year and spring-autumn values. 
 #Return a list with 4 stacks, each stack represent a year. 
-mean_by_season <- function(dir,num_years,export=TRUE){
+calc_by_season <- function(dir,num_years,method,filename,export=TRUE){
   
   #we separate data for each season. 
   stacks <- separate_by_season(dir,num_years)
@@ -98,8 +98,8 @@ mean_by_season <- function(dir,num_years,export=TRUE){
   }
   
   print("calculating mean for summer")
-  final_summer<- stackApply(summer_stack,indices = indexes_fin ,fun=mean)
-
+  final_summer<- stackApply(summer_stack,indices = indexes_fin ,fun=method)
+  
   
   #create an array with index distribution to do stackAppy
   #For autumn,winter,spring we choose 6 images to make a year. 
@@ -110,28 +110,28 @@ mean_by_season <- function(dir,num_years,export=TRUE){
   }
   
   print("calculating mean for autumn")
-  final_autumn<- stackApply(autumn_stack,indices = indexes_fin ,fun=mean)
-
+  final_autumn<- stackApply(autumn_stack,indices = indexes_fin ,fun=method)
+  
   
   print("calculating mean for winter")
-  final_winter <-stackApply(winter_stack,indices = indexes_fin ,fun=mean)
-
+  final_winter <-stackApply(winter_stack,indices = indexes_fin ,fun=method)
+  
   print("calculating mean for spring")
-  final_spring <- stackApply(spring_stack,indices = indexes_fin ,fun=mean)
-
+  final_spring <- stackApply(spring_stack,indices = indexes_fin ,fun=method)
+  
   
   
   #return results in case we need them later. 
   results <- list("summer"=final_summer,"autumn"=final_autumn,"winter"=final_winter,"spring"=final_spring)
   
-
+  
   #calculate the average of all years. Creates a TIF file with one layer. 
   indexes_fin <- c()
   indexes_fin <- 1:num_years
   indexes_fin<- c(indexes_fin,indexes_fin,indexes_fin,indexes_fin)
   print("calculating mean per year")
   final_stack <- stack(final_summer,final_autumn,final_winter,final_spring)
-  final_mean <- stackApply(final_stack,indices =indexes_fin, fun = mean)
+  final_mean <- stackApply(final_stack,indices =indexes_fin, fun = method)
   
   #calculate a delta of spring and autumn. 
   print("calculating delta spring-autumn")
@@ -139,14 +139,26 @@ mean_by_season <- function(dir,num_years,export=TRUE){
   print("Mean calculated!")
   
   #create files only if export = TRUE
-  if(export==TRUE){
+  if(export){
     print("writing files")
-    writeRaster(final_spring, filename = "mean_autumn.tif", overwrite=TRUE)
-    writeRaster(final_winter, filename = "mean_summer.tif", overwrite=TRUE)
-    writeRaster(final_autumn, filename = "mean_spring.tif", overwrite=TRUE)
-    writeRaster(final_summer, filename = "mean_winter.tif", overwrite=TRUE)
-    writeRaster(final_mean, filename = "mean_total.tif", overwrite=TRUE)
-    writeRaster(final_delta,filename = "delta_spring_autumn.tif",overwrite = TRUE)
+    
+    file_name<- paste(filename,"_autumn.tif",sep="")
+    writeRaster(final_spring, filename = file_name, overwrite=TRUE)
+    
+    file_name<- paste(filename,"_summer.tif",sep="")
+    writeRaster(final_winter, filename = file_name, overwrite=TRUE)
+    
+    file_name<- paste(filename,"_spring.tif",sep="")
+    writeRaster(final_autumn, filename = file_name, overwrite=TRUE)
+    
+    file_name<- paste(filename,"_winter.tif",sep="")
+    writeRaster(final_summer, filename = file_name, overwrite=TRUE)
+    
+    file_name<- paste(filename,"_total.tif",sep="")
+    writeRaster(final_mean, filename = file_name, overwrite=TRUE)
+    
+    file_name<- paste(filename,"_delta_spring_autumn.tif")
+    writeRaster(final_delta,filename = file_name,overwrite = TRUE)
   }
   
   return(results)
@@ -154,4 +166,4 @@ mean_by_season <- function(dir,num_years,export=TRUE){
 
 
 #############################################################################################################
-mean_by_season("/home/florencia/Documentos/UC/NDVI_ZAA",17,TRUE)
+calc_by_season("/home/florencia/Documentos/UC/NDVI_ZAA",17,sd,"SD")
