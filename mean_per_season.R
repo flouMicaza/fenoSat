@@ -26,7 +26,6 @@ separate_by_season <- function(dir, num_years){
   print("Year 1")
   images<-1:5
   
-  print(paste("imagenes a meter a summer:",files[1:5]))
   
   summer_stack <-stack(files[1:5]) #append new layers
   files <- files[-images] #drop images that are already in a stack. 
@@ -49,27 +48,23 @@ separate_by_season <- function(dir, num_years){
     print(paste("Year",year))
     
     #For summer season a year is represented by 5 images
-    print(paste("imagenes a meter a summer:",files[1:5]))
+    
     images<-1:5
     summer_stack <- stack(summer_stack,stack(files[1:5])) #append new layers
-    print(paste("summer",files[5]))
     files <- files[-images] #drop images that are already in a stack. 
     
     #For other seasons a year is represented by 6 images. 
-    print(paste("imagenes a meter a autumn:",files[1:6]))
     images<-1:6
     autumn_stack <- stack(autumn_stack,stack(files[1:6])) #append new layers
     files <- files[-images]
     
-    print(paste("imagenes a meter a winter:",files[1:6]))
     winter_stack <- stack(winter_stack,stack(files[1:6])) #append new layers
     files <- files[-images]
     
-    print(paste("imagenes a meter a spring:",files[1:6]))
     spring_stack <- stack(spring_stack,stack(files[1:6])) #append new layers
     files <- files[-images]
   }
-  print(nlayers(summer_stack))
+  
   results <- list("summer"=summer_stack,"autumn"=autumn_stack,"winter"=winter_stack,"spring"=spring_stack)
   print("Stacks per season ready!")
   return(results)
@@ -88,18 +83,22 @@ mean_by_season <- function(dir,num_years){
   winter_stack <- stacks$winter
   spring_stack <- stacks$spring
   
-  #create an array with index distribution to do stackAppy
-  #For summer we choose 5 images to make a year.
+  #Create a new folder to save new files. 
+  #If it already exists it will show a warning. 
   new_dir<- paste(dir,"/stats",sep="")
   dir.create(new_dir)  
   setwd(new_dir)
+  
+  
+  #Create an array with index distribution to do stackAppy
+  #For summer we choose 5 images to make a year.
   indexes_fin <- c()
   for (i in 1:num_years) {
     indexes <- rep(i,times=5)
     indexes_fin <- c(indexes_fin,indexes)
   }
+  
   print("calculating mean for summer")
-  print(paste("summer tiene",nlayers(summer_stack),"layers"))
   final_summer<- stackApply(summer_stack,indices = indexes_fin ,fun=mean,filename = 'mean_summer.tif',overwrite=TRUE )
   
   
@@ -110,21 +109,22 @@ mean_by_season <- function(dir,num_years){
     indexes <- rep(i,times=6)
     indexes_fin <- c(indexes_fin,indexes)
   }
-
   
   print("calculating mean for autumn")
-  print(paste("Autumn tiene",nlayers(autumn_stack),"layers"))
   final_autumn<- stackApply(autumn_stack,indices = indexes_fin ,fun=mean,filename = 'mean_autumn.tif',overwrite=TRUE )
   
   
   print("calculating mean for winter")
-  print(paste("Winter tiene",nlayers(winter_stack),"layers"))
   final_winter <-stackApply(winter_stack,indices = indexes_fin ,fun=mean,filename = 'mean_winter.tif',overwrite=TRUE )
   
  
   print("calculating mean for spring")
-  print(paste("Spring tiene",nlayers(spring_stack),"layers"))
   final_spring <- stackApply(spring_stack,indices = indexes_fin ,fun=mean,filename = 'mean_spring.tif',overwrite=TRUE )
+  
+  print("calculating mean per year")
+  final_stack <- stack(summer_stack,autumn_stack,winter_stack,spring_stack)
+  final_mean <- stackApply(final_stack,indices = , fun = mean, filename="mean_total.tif",overwrite=TRUE)
+  
   print("Mean calculated!")
 }
 
