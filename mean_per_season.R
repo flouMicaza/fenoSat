@@ -124,12 +124,14 @@ mean_by_season <- function(dir,num_years){
   #return results in case we need them later. 
   results <- list("summer"=final_summer,"autumn"=final_autumn,"winter"=final_winter,"spring"=final_spring)
 
-  
-  #calculate the average of all years. Creates a TIF file with one lyer. 
-  indexes_fin <- rep(1,times = num_years)
+
+  #calculate the average of all years. Creates a TIF file with one layer. 
+  indexes_fin <- c()
+  indexes_fin <- 1:num_years
+  indexes_fin<- c(indexes_fin,indexes_fin,indexes_fin,indexes_fin)
   print("calculating mean per year")
-  final_stack <- stack(summer_stack,autumn_stack,winter_stack,spring_stack)
-  final_mean <- stackApply(final_stack,indices =indexes_fin , fun = mean, filename="mean_total.tif",overwrite=TRUE)
+  final_stack <- stack(final_summer,final_autumn,final_winter,final_spring)
+  final_mean <- stackApply(final_stack,indices =indexes_fin, fun = mean, filename="mean_total.tif",overwrite=TRUE)
   
   #calculate a delta of spring and autumn. 
   print("calculating delta spring-autumn")
