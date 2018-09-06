@@ -99,7 +99,7 @@ mean_by_season <- function(dir,num_years){
   }
   
   print("calculating mean for summer")
-  final_summer<- stackApply(summer_stack,indices = indexes_fin ,fun=mean,filename = 'mean_summer.tif',overwrite=TRUE )
+  final_summer<- stackApply(summer_stack,indices = indexes_fin ,fun=mean,filename = 'mean_spring.tif',overwrite=TRUE )
   
   
   #create an array with index distribution to do stackAppy
@@ -111,20 +111,31 @@ mean_by_season <- function(dir,num_years){
   }
   
   print("calculating mean for autumn")
-  final_autumn<- stackApply(autumn_stack,indices = indexes_fin ,fun=mean,filename = 'mean_autumn.tif',overwrite=TRUE )
+  final_autumn<- stackApply(autumn_stack,indices = indexes_fin ,fun=mean,filename = 'mean_spring.tif',overwrite=TRUE )
   
   
   print("calculating mean for winter")
-  final_winter <-stackApply(winter_stack,indices = indexes_fin ,fun=mean,filename = 'mean_winter.tif',overwrite=TRUE )
+  final_winter <-stackApply(winter_stack,indices = indexes_fin ,fun=mean,filename = 'mean_summer.tif',overwrite=TRUE )
   
  
   print("calculating mean for spring")
-  final_spring <- stackApply(spring_stack,indices = indexes_fin ,fun=mean,filename = 'mean_spring.tif',overwrite=TRUE )
+  final_spring <- stackApply(spring_stack,indices = indexes_fin ,fun=mean,filename = 'mean_autumn.tif',overwrite=TRUE )
   
+  #return results in case we need them later. 
+  results <- list("summer"=final_summer,"autumn"=final_autumn,"winter"=final_winter,"spring"=final_spring)
+
+  
+  #calculate the average of all years. Creates a TIF file with one lyer. 
+  indexes_fin <- rep(1,times = num_years)
   print("calculating mean per year")
   final_stack <- stack(summer_stack,autumn_stack,winter_stack,spring_stack)
-  final_mean <- stackApply(final_stack,indices = , fun = mean, filename="mean_total.tif",overwrite=TRUE)
+  final_mean <- stackApply(final_stack,indices =indexes_fin , fun = mean, filename="mean_total.tif",overwrite=TRUE)
   
+  #calculate a delta of spring and autumn. 
+  print("calculating delta spring-autumn")
+  final_delta <- autumn_stack-spring_stack
+  writeRaster(final_delta, filename = "delta_spring_autumn.tif", overwrite=TRUE)
   print("Mean calculated!")
+  return(results)
 }
 
