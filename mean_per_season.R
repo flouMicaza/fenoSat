@@ -99,7 +99,7 @@ mean_by_season <- function(dir,num_years){
   }
   
   print("calculating mean for summer")
-  final_summer<- stackApply(summer_stack,indices = indexes_fin ,fun=mean,filename = 'mean_spring.tif',overwrite=TRUE )
+  final_summer<- stackApply(summer_stack,indices = indexes_fin ,fun=mean,filename = 'mean_winter.tif',overwrite=TRUE )
   
   
   #create an array with index distribution to do stackAppy
