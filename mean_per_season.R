@@ -154,4 +154,4 @@ mean_by_season <- function(dir,num_years,export=TRUE){
 
 
 #############################################################################################################
-mean_by_season("/home/florencia/Documentos/UC/NDVI_ZAA",17,TRUE)
+mean_by_season("/home/florencia/Documentos/UC/NDVI_ZAA/stats/Flo",17,TRUE)
